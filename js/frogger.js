@@ -1,7 +1,13 @@
+let availableHt = window.screen.availHeight;
+let availableW = window.screen.availWidth;
+
 var config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    parent: 'arghcade',
+    width: availableW,
+    height: availableHt,
+    // width: 560,
+    // height: 640,
     physics: {
         default: 'arcade',
         arcade: {
@@ -16,28 +22,18 @@ var config = {
     }
 };
 
-var player;
-var bombs;
-var stars;
-var platforms;
-var cursors;
-var score = 0;
-var scoreText;
+console.log(window.screen);
 
 var game = new Phaser.Game(config);
 
 function preload () {
     this.load.image('frogger_bg', 'assets/frogger/frogger_bg.png');
-    // this.load.image('ground', 'assets/platform.png');
-    // this.load.image('star', 'assets/star.png');
-    // this.load.image('bomb', 'assets/bomb.png');
-    // this.load.spritesheet('dude', 'assets/dude.png', {frameWidth: 32, frameHeight: 48});
 }
 
 function create ()
 {
-    bgImage = this.add.image(400, 300, 'frogger_bg');
-    bgImage.setScale(2);
+    bgImage = this.add.image(availableW / 2, availableHt / 2, 'frogger_bg');
+    bgImage.setScale(availableHt / 256);
     // 224 256
 }
 
