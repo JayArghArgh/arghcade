@@ -29,6 +29,7 @@ console.log(window.screen);
 
 let game = new Phaser.Game(config);
 let player;
+let cursors;
 
 function preload () {
     this.load.image('frogger_bg', 'assets/frogger/frogger_bg.png');
@@ -43,18 +44,36 @@ function create ()
 {
     bgImage = this.add.image(availableW / 2, availableHt / 2, 'frogger_bg');
     bgImage.setScale(gameScale);
+    cursors = this.input.keyboard.createCursorKeys();
 
     player = this.add.sprite(availableW / 2, availableHt - SPRITE_SIZE * gameScale * 1.5, 'frogger_spritesheet');
     // 224 256
     this.anims.create({
         key: 'ahead',
         frames: [{key: 'frogger_spritesheet', frame: 3}],
-        frameRate: 20
+        frameRate: 1
     });
     player.setScale(gameScale);
 
 }
 
-function update ()
-{
+function update () {
+    if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
+        console.log('released my dude');
+        console.log(player.y);
+        player.setY(player.y - (SPRITE_SIZE * gameScale));
+        console.log(player.y);
+    };
+
+        //
+        // if (Phaser.Input.Keyboard.JustDown(spacebar))
+        // {
+        //     var bullet = bullets.get();
+        //
+        //     if (bullet)
+        //     {
+        //         bullet.fire(ship.x, ship.y);
+        //     }
+        // }
+
 }
