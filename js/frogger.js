@@ -14,7 +14,7 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
+            // gravity: { y: 300 },
             debug: false
         }
     },
@@ -31,6 +31,7 @@ let game = new Phaser.Game(config);
 let player;
 let cursors;
 
+
 function preload () {
     this.load.image('frogger_bg', 'assets/frogger/frogger_bg.png');
     this.load.spritesheet(
@@ -46,23 +47,38 @@ function create ()
     bgImage.setScale(gameScale);
     cursors = this.input.keyboard.createCursorKeys();
 
-    player = this.add.sprite(availableW / 2, availableHt - SPRITE_SIZE * gameScale * 1.5, 'frogger_spritesheet');
+    // let rectangleBase = this.add.rectangle(200, 400, 148, 148, 0xff6699);
+    // let rect1 = this.add.rectangle(50, availableHt - 50, availableW, 50, 0x37c3be);
+    // this.physics.add.existing(rect1);
+
+
+    player = this.physics.add.sprite(availableW / 2, availableHt - SPRITE_SIZE * gameScale * 1.5, 'frogger_spritesheet');
     // 224 256
+    player.setCollideWorldBounds(true);
+
     this.anims.create({
         key: 'ahead',
-        frames: [{key: 'frogger_spritesheet', frame: 3}],
-        frameRate: 1
+        frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 0, end: 2}),
+        frameRate: 5,
+        repeat: 1
     });
     player.setScale(gameScale);
+
+    // this.physics.add.collider(player, rect1);
 
 }
 
 function update () {
     if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
-        console.log('released my dude');
-        console.log(player.y);
         player.setY(player.y - (SPRITE_SIZE * gameScale));
-        console.log(player.y);
+        // player.setVelocityY(-160);
+        player.anims.play('ahead', true);
+    } else if (Phaser.Input.Keyboard.JustDown(cursors.left)) {
+        player.setX(player.x - (SPRITE_SIZE * gameScale));
+    } else if (Phaser.Input.Keyboard.JustDown(cursors.right)) {
+        player.setX(player.x + (SPRITE_SIZE * gameScale));
+    }  else if (Phaser.Input.Keyboard.JustDown(cursors.down)) {
+        player.setY(player.y + (SPRITE_SIZE * gameScale));
     };
 
         //
