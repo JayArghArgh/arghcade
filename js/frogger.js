@@ -1,6 +1,7 @@
 const GAME_SIZE = 256;
 const GAME_WIDTH = 224;
 const GAME_HEIGHT = 256;
+const GAME_HEIGHT_REMOVAL = 150;
 const SPRITE_SIZE = 16;
 const MIN_V_LEVEL = 1;
 const MAX_V_LEVEL = 13;
@@ -10,7 +11,7 @@ const PLAYER_SPEED = 500;
 
 let availableHt = window.screen.availHeight;
 let availableW = window.screen.availWidth;
-let gameScale = (availableHt - 100) / GAME_SIZE;
+let gameScale = (availableHt - GAME_HEIGHT_REMOVAL) / GAME_SIZE;
 let player_vertLevel = MIN_V_LEVEL;
 let player_horizLevel = 7;
 
@@ -173,5 +174,5 @@ function deadFroggo(player, wall) {
 }
 
 function winFroggo(player, winBlock) {
-    player.setTint(0xffcc00);
+    player.setTint(0x00ff00);
 }
