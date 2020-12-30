@@ -10,7 +10,7 @@ const PLAYER_SPEED = 500;
 
 let availableHt = window.screen.availHeight;
 let availableW = window.screen.availWidth;
-let gameScale = availableHt / GAME_SIZE;
+let gameScale = (availableHt - 300) / GAME_SIZE;
 let player_vertLevel = MIN_V_LEVEL;
 let player_horizLevel = 7;
 
@@ -77,8 +77,7 @@ function create () {
 
     // Starting point for Frogger
     let spritePositionHz = GAME_WIDTH * gameScale / 2;
-    let spritePositionV = availableHt - ( SPRITE_SIZE * gameScale * 1.5);
-
+    let spritePositionV = GAME_HEIGHT * gameScale - (SPRITE_SIZE * gameScale * 1.5);
     // Place the froggo.
     player = this.physics.add.sprite(spritePositionHz, spritePositionV , 'frogger_spritesheet');
     player.setCollideWorldBounds(true);
