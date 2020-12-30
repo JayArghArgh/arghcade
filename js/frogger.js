@@ -37,28 +37,43 @@ console.log(window.screen);
 let game = new Phaser.Game(config);
 let player;
 let cursors;
-var source;
-var target = new Phaser.Math.Vector2();
+let target = new Phaser.Math.Vector2();
 let allowButton = true;
+let parapets;
+let invisibleWall;
 
 function preload () {
     this.load.image('froggo', 'assets/frogger/icon-frogger-pixel-512x512.png');
     this.load.image('frogger_bg', 'assets/frogger/frogger_bg.png');
+    this.load.image('blank', 'assets/frogger/blank1616.png');
     this.load.spritesheet(
         'frogger_spritesheet',
         'assets/frogger/frogger_spritesheet.png',
         {frameWidth: SPRITE_SIZE, frameHeight: SPRITE_SIZE}
         );
+    this.load.image('ground', 'assets/frogger/icon-frogger-pixel-512x512.png');
 }
 
 
 function create () {
+
+    cursors = this.input.keyboard.createCursorKeys();
+
+    let parapetPositionX = -0.5;
+    let parapetPositionY = 2.5;
+    // let numParapets = 6;
+
+    parapets = this.physics.add.staticGroup();
+
+    parapets.create((parapetPositionX) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
+    parapets.create((parapetPositionX + 3) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
+    parapets.create((parapetPositionX + 6) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
+    parapets.create((parapetPositionX + 9) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
+    parapets.create((parapetPositionX + 12) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
+    parapets.create((parapetPositionX + 15) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
+
     bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
     bgImage.setScale(gameScale);
-    cursors = this.input.keyboard.createCursorKeys();
-    // source = this.physics.add.image(100, 300, 'froggo');
-    // source.setScale(0.1);
-    cursors = this.input.keyboard.createCursorKeys();
 
     // Starting point for Frogger
     let spritePositionHz = GAME_WIDTH * gameScale / 2;
@@ -76,13 +91,11 @@ function create () {
     });
 
     player.setScale(gameScale);
-
-    // this.physics.add.collider(player, rect1);
+    this.physics.add.collider(player, parapets, deadFroggo, null, this);
 
 }
 
-function update ()
-{
+function update () {
     if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
         if (allowButton && player_vertLevel < MAX_V_LEVEL) {
             allowButton = false;
@@ -145,4 +158,9 @@ function update ()
             allowButton = true;
         }
     }
+}
+
+function deadFroggo(player, wall) {
+    player.setTint(0xff0000);
+    gameOver = true;
 }
