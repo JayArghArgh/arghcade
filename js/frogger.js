@@ -30,9 +30,13 @@ console.log(window.screen);
 let game = new Phaser.Game(config);
 let player;
 let cursors;
-
+var source;
+var target = new Phaser.Math.Vector2();
+let allowButton = true;
+// new Phaser.Game(config);
 
 function preload () {
+    this.load.image('froggo', 'assets/frogger/icon-frogger-pixel-512x512.png');
     this.load.image('frogger_bg', 'assets/frogger/frogger_bg.png');
     this.load.spritesheet(
         'frogger_spritesheet',
@@ -41,55 +45,148 @@ function preload () {
         );
 }
 
+
 function create ()
 {
+
     bgImage = this.add.image(availableW / 2, availableHt / 2, 'frogger_bg');
     bgImage.setScale(gameScale);
     cursors = this.input.keyboard.createCursorKeys();
+    // source = this.physics.add.image(100, 300, 'froggo');
+    // source.setScale(0.1);
+    cursors = this.input.keyboard.createCursorKeys();
 
-    // let rectangleBase = this.add.rectangle(200, 400, 148, 148, 0xff6699);
-    // let rect1 = this.add.rectangle(50, availableHt - 50, availableW, 50, 0x37c3be);
-    // this.physics.add.existing(rect1);
+    let spritePositionHz = availableW / 2;
+    let spritePositionV = availableHt - ( SPRITE_SIZE * gameScale * 1.5);
 
-
-    player = this.physics.add.sprite(availableW / 2, availableHt - SPRITE_SIZE * gameScale * 1.5, 'frogger_spritesheet');
+    player = this.physics.add.sprite(spritePositionHz, spritePositionV , 'frogger_spritesheet');
     // 224 256
     player.setCollideWorldBounds(true);
 
     this.anims.create({
         key: 'ahead',
-        frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 0, end: 2}),
-        frameRate: 5,
+        frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 1, end: 2}),
+        frameRate: 15,
         repeat: 1
     });
+
+    this.anims.create({
+        key: 'ahead_0',
+        frames: [{ key: 'frogger_spritesheet', frame: 0}],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'ahead_1',
+        frames: [{ key: 'frogger_spritesheet', frame: 1}],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'ahead_2',
+        frames: [{ key: 'frogger_spritesheet', frame: 2}],
+        frameRate: 20
+    });
+
+
+    player.anims.play('ahead_0', true);
     player.setScale(gameScale);
 
     // this.physics.add.collider(player, rect1);
 
 }
 
-function update () {
+function update ()
+{
     if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
-        player.setY(player.y - (SPRITE_SIZE * gameScale));
-        // player.setVelocityY(-160);
-        player.anims.play('ahead', true);
+        if (allowButton) {
+            allowButton = false;
+            player.angle = 0;
+            player.anims.play('ahead', true);
+            target.x = player.x;
+            target.y = player.y - SPRITE_SIZE * gameScale;
+            this.physics.moveToObject(player, target, 200);
+            console.log(player.x, player.y);
+        }
+
+    } else if (Phaser.Input.Keyboard.JustDown(cursors.down)) {
+        if (allowButton) {
+            allowButton = false;
+            player.angle = 180;
+            player.anims.play('ahead', true);
+            target.x = player.x;
+            target.y = player.y + SPRITE_SIZE * gameScale;
+            this.physics.moveToObject(player, target, 200);
+            console.log(player.x, player.y);
+        }
+
     } else if (Phaser.Input.Keyboard.JustDown(cursors.left)) {
-        player.setX(player.x - (SPRITE_SIZE * gameScale));
+        if (allowButton) {
+            allowButton = false;
+            player.angle = 270;
+            player.anims.play('ahead', true);
+            target.x = player.x - SPRITE_SIZE * gameScale;
+            target.y = player.y;
+            this.physics.moveToObject(player, target, 200);
+            console.log(player.x, player.y);
+        }
+
     } else if (Phaser.Input.Keyboard.JustDown(cursors.right)) {
-        player.setX(player.x + (SPRITE_SIZE * gameScale));
-    }  else if (Phaser.Input.Keyboard.JustDown(cursors.down)) {
-        player.setY(player.y + (SPRITE_SIZE * gameScale));
-    };
+        if (allowButton) {
+            allowButton = false;
+            player.angle = 90;
+            player.anims.play('ahead', true);
+            target.x = player.x + SPRITE_SIZE * gameScale;
+            target.y = player.y;
+            this.physics.moveToObject(player, target, 200);
+            console.log(player.x, player.y);
+        }
 
-        //
-        // if (Phaser.Input.Keyboard.JustDown(spacebar))
-        // {
-        //     var bullet = bullets.get();
-        //
-        //     if (bullet)
-        //     {
-        //         bullet.fire(ship.x, ship.y);
-        //     }
-        // }
+    }
 
+
+    let distance = Phaser.Math.Distance.Between(player.x, player.y, target.x, target.y);
+
+    if (player.body.speed > 0)
+    {
+
+        //  4 is our distance tolerance, i.e. how close the source can get to the target
+        //  before it is considered as being there. The faster it moves, the more tolerance is required.
+        if (distance < 4)
+        {
+            player.body.reset(target.x, target.y);
+            allowButton = true;
+        }
+    }
 }
+
+
+
+
+
+
+// function update () {
+//     let newPLayerY = player.y - ((SPRITE_SIZE * gameScale) / 2);
+//     let newPlayerX = (SPRITE_SIZE * gameScale) / 2;
+//
+//
+//     if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
+//         player.anims.play('ahead', true);
+//         player.setVelocityY(-160);
+//         // this.physics.moveTo(player, player.x, newPLayerY, 300);
+//
+//         //
+//         // this.physics.moveTo(player, player.x, player.y - (SPRITE_SIZE * gameScale), 2000);
+//         // player.setY(player.y - ((SPRITE_SIZE * gameScale) / 2));
+//         // player.anims.play('ahead_2', true);
+//         // player.setY(player.y - ((SPRITE_SIZE * gameScale) / 2));
+//         // player.anims.play('ahead_0', true);
+//     } else if (Phaser.Input.Keyboard.JustDown(cursors.left)) {
+//         player.setX(player.x - (SPRITE_SIZE * gameScale));
+//     } else if (Phaser.Input.Keyboard.JustDown(cursors.right)) {
+//         player.setX(player.x + (SPRITE_SIZE * gameScale));
+//     }  else if (Phaser.Input.Keyboard.JustDown(cursors.down)) {
+//         player.setY(player.y + (SPRITE_SIZE * gameScale));
+//     };
+//
+// }
