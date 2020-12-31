@@ -3,17 +3,34 @@ const GAME_WIDTH = 224;
 const GAME_HEIGHT = 256;
 const GAME_HEIGHT_REMOVAL = 150;
 const SPRITE_SIZE = 16;
+// The levels the sprite is at.
 const MIN_V_LEVEL = 1;
 const MAX_V_LEVEL = 13;
 const MIN_H_LEVEL = 1;
 const MAX_H_LEVEL = 13;
+
 const PLAYER_SPEED = 500;
 
 let availableHt = window.screen.availHeight;
 let availableW = window.screen.availWidth;
 let gameScale = (availableHt - GAME_HEIGHT_REMOVAL) / GAME_SIZE;
-let player_vertLevel = MIN_V_LEVEL;
-let player_horizLevel = 7;
+
+let player_origVertLevel = MIN_V_LEVEL;
+let player_origHorizLevel = 7;
+
+let player_vertLevel = player_origVertLevel;
+let player_horizLevel = player_origHorizLevel;
+
+// Starting point for Frogger
+let spritePositionHz = GAME_WIDTH * gameScale / 2;
+let spritePositionV = GAME_HEIGHT * gameScale - (SPRITE_SIZE * gameScale * 1.5);
+
+let player;
+let cursors;
+let target = new Phaser.Math.Vector2();
+let allowButton = true;
+let parapets;
+let winnerBlocks;
 
 let config = {
     type: Phaser.AUTO,
@@ -33,15 +50,7 @@ let config = {
     }
 };
 
-console.log(window.screen);
-
 let game = new Phaser.Game(config);
-let player;
-let cursors;
-let target = new Phaser.Math.Vector2();
-let allowButton = true;
-let parapets;
-let winnerBlocks;
 
 function preload () {
     this.load.image('froggo', 'assets/frogger/icon-frogger-pixel-512x512.png');
@@ -76,7 +85,6 @@ function create () {
     bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
     bgImage.setScale(gameScale);
 
-
     // Create target blocks for froggo to jump into.
     winnerBlocks = this.physics.add.staticGroup();
     winnerBlocks.create((parapetPositionX + 1.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
@@ -84,9 +92,7 @@ function create () {
     winnerBlocks.create((parapetPositionX + 7.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
     winnerBlocks.create((parapetPositionX + 10.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
     winnerBlocks.create((parapetPositionX + 13.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
-    // Starting point for Frogger
-    let spritePositionHz = GAME_WIDTH * gameScale / 2;
-    let spritePositionV = GAME_HEIGHT * gameScale - (SPRITE_SIZE * gameScale * 1.5);
+
     // Place the froggo.
     player = this.physics.add.sprite(spritePositionHz, spritePositionV , 'frogger_spritesheet');
     player.setCollideWorldBounds(true);
@@ -107,6 +113,7 @@ function create () {
 
     player.setScale(gameScale);
     player.anims.play('still', true);
+    // player.frame = 6;
 
     // Set the colliders.
     this.physics.add.collider(player, parapets, deadFroggo, null, this);
@@ -170,6 +177,7 @@ function update () {
         {
             player.body.reset(target.x, target.y);
             allowButton = true;
+            console.log("buttons allowed");
         }
     }
 }
@@ -179,6 +187,14 @@ function deadFroggo(player, wall) {
     gameOver = true;
 }
 
-function winFroggo(player, winBlock) {
+function winFroggo(player, target) {
+    player.body.stop();
+    player.body.reset(spritePositionHz, spritePositionV);
+    allowButton = true;
+
+    player_horizLevel = player_origHorizLevel;
+    player_vertLevel = player_origVertLevel;
+    // target.x = player_origHorizLevel;
+    // target.y = player_origVertLevel;
     player.setTint(0x00ff00);
 }
