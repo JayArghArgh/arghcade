@@ -79,31 +79,39 @@ function create () {
     let parapetPositionY = 2.5;
     // let numParapets = 6;
 
+    // Load here for debugging.
+    // bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
+    // bgImage.setScale(gameScale);
+
     // Create the Parapets at the end of the course that froggo can crash into.
-    parapets = this.physics.add.staticGroup();
-    parapets.create((parapetPositionX) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
-    parapets.create((parapetPositionX + 3) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
-    parapets.create((parapetPositionX + 6) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
-    parapets.create((parapetPositionX + 9) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
-    parapets.create((parapetPositionX + 12) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
-    parapets.create((parapetPositionX + 15) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
+    parapets = this.physics.add.staticGroup({
+        key: 'blank',
+        repeat: 6,
+        setXY: {x: (parapetPositionX) * SPRITE_SIZE * gameScale, y: parapetPositionY * SPRITE_SIZE * gameScale, stepX: SPRITE_SIZE * gameScale * 3}
+    });
+
+    parapets.children.iterate(function (child) {
+        // child.setScale(gameScale);
+        child.scaleX = 2 + gameScale;
+    });
 
     // Create target blocks for froggo to jump into.
-    winnerBlocks = this.physics.add.staticGroup();
-    winnerBlocks.create((parapetPositionX + 1.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
-    winnerBlocks.create((parapetPositionX + 4.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
-    winnerBlocks.create((parapetPositionX + 7.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
-    winnerBlocks.create((parapetPositionX + 10.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
-    winnerBlocks.create((parapetPositionX + 13.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
+    winnerBlocks = this.physics.add.staticGroup({
+        key: 'blank',
+        repeat: 5,
+        setXY: {x: (parapetPositionX + 1.5) * SPRITE_SIZE * gameScale, y: parapetPositionY * SPRITE_SIZE * gameScale, stepX: SPRITE_SIZE * gameScale * 3}
+    });
 
     bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
     bgImage.setScale(gameScale);
+
     scoreText = this.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#fff'});
 
     // Place the froggo.
     player = this.physics.add.sprite(spritePositionHz, spritePositionV , 'frogger_spritesheet');
     player.setCollideWorldBounds(true);
 
+    // Creates the sprite to just stand still.
     this.anims.create({
         key: 'still',
         frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 2, end: 2}),
@@ -119,13 +127,13 @@ function create () {
         repeat: 1
     });
 
+    // Creates the sprite for the winner froggo
     this.anims.create({
         key: 'smuggy',
         frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 64, end: 64}),
         frameRate: 10,
         repeat: -1
     });
-
 
     // Green frog in parapet
     smugFrogs = this.physics.add.group({
@@ -139,7 +147,6 @@ function create () {
         child.anims.play('smuggy', true);
         child.setVisible(false);
     });
-
 
     player.setScale(gameScale);
     player.anims.play('still', true);
