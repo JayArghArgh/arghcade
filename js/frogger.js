@@ -129,21 +129,20 @@ function create () {
     });
 
     smugFrogs.children.iterate(function (child) {
-        child.setScale(gameScale);
+        // child.setScale(gameScale);
         child.anims.play('smuggy', true);
         child.setVisible(false);
     });
 
 
     player.setScale(gameScale);
-
     player.anims.play('still', true);
     // player.frame = 6;
 
     // Set the colliders.
     this.physics.add.collider(player, parapets, deadFroggo, null, this);
     this.physics.add.overlap(player, winnerBlocks, winFroggo);
-    this.physics.add.overlap(player, smugFrogs, showSmuggy);
+    this.physics.add.overlap(player, smugFrogs, showSmuggy, null, this);
 }
 
 function update () {
@@ -213,7 +212,9 @@ function deadFroggo(player, wall) {
 }
 
 function showSmuggy(player, smuggy) {
+    smuggy.setScale(gameScale);
     smuggy.setVisible(true);
+    smuggy.setActive(false);
 }
 
 function winFroggo(player) {
@@ -225,5 +226,5 @@ function winFroggo(player) {
     player_vertLevel = player_origVertLevel;
     // target.x = player_origHorizLevel;
     // target.y = player_origVertLevel;
-    player.setTint(0x00ff00);
+    // player.setTint(0x00ff00);
 }
