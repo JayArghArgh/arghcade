@@ -31,6 +31,7 @@ let target = new Phaser.Math.Vector2();
 let allowButton = true;
 let parapets;
 let winnerBlocks;
+let smugFrogs;
 
 let config = {
     type: Phaser.AUTO,
@@ -82,9 +83,6 @@ function create () {
     parapets.create((parapetPositionX + 12) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
     parapets.create((parapetPositionX + 15) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = 2 + gameScale;
 
-    bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
-    bgImage.setScale(gameScale);
-
     // Create target blocks for froggo to jump into.
     winnerBlocks = this.physics.add.staticGroup();
     winnerBlocks.create((parapetPositionX + 1.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
@@ -92,6 +90,9 @@ function create () {
     winnerBlocks.create((parapetPositionX + 7.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
     winnerBlocks.create((parapetPositionX + 10.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
     winnerBlocks.create((parapetPositionX + 13.5) * SPRITE_SIZE * gameScale, parapetPositionY * SPRITE_SIZE * gameScale, 'blank').scaleX = .5 + gameScale;
+
+    bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
+    bgImage.setScale(gameScale);
 
     // Place the froggo.
     player = this.physics.add.sprite(spritePositionHz, spritePositionV , 'frogger_spritesheet');
@@ -104,6 +105,7 @@ function create () {
         repeat: 1
     });
 
+    // Just froggo looking ahead.
     this.anims.create({
         key: 'ahead',
         frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 1, end: 2}),
@@ -111,13 +113,37 @@ function create () {
         repeat: 1
     });
 
+    this.anims.create({
+        key: 'smuggy',
+        frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 64, end: 64}),
+        frameRate: 10,
+        repeat: -1
+    });
+
+
+    // Green frog in parapet
+    smugFrogs = this.physics.add.group({
+        key: 'smuggy',
+        repeat: 5,
+        setXY: {x: (parapetPositionX + 1.5) * SPRITE_SIZE * gameScale, y: parapetPositionY * SPRITE_SIZE * gameScale, stepX: SPRITE_SIZE * gameScale * 3}
+    });
+
+    smugFrogs.children.iterate(function (child) {
+        child.setScale(gameScale);
+        child.anims.play('smuggy', true);
+        child.setVisible(false);
+    });
+
+
     player.setScale(gameScale);
+
     player.anims.play('still', true);
     // player.frame = 6;
 
     // Set the colliders.
     this.physics.add.collider(player, parapets, deadFroggo, null, this);
-    this.physics.add.overlap(player, winnerBlocks, winFroggo, null, this);
+    this.physics.add.overlap(player, winnerBlocks, winFroggo);
+    this.physics.add.overlap(player, smugFrogs, showSmuggy);
 }
 
 function update () {
@@ -177,7 +203,6 @@ function update () {
         {
             player.body.reset(target.x, target.y);
             allowButton = true;
-            console.log("buttons allowed");
         }
     }
 }
@@ -187,7 +212,11 @@ function deadFroggo(player, wall) {
     gameOver = true;
 }
 
-function winFroggo(player, target) {
+function showSmuggy(player, smuggy) {
+    smuggy.setVisible(true);
+}
+
+function winFroggo(player) {
     player.body.stop();
     player.body.reset(spritePositionHz, spritePositionV);
     allowButton = true;
