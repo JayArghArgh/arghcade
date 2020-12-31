@@ -80,8 +80,8 @@ function create () {
     // let numParapets = 6;
 
     // Load here for debugging.
-    // bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
-    // bgImage.setScale(gameScale);
+    bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
+    bgImage.setScale(gameScale);
 
     // Create the Parapets at the end of the course that froggo can crash into.
     parapets = this.physics.add.staticGroup({
@@ -94,16 +94,6 @@ function create () {
         // child.setScale(gameScale);
         child.scaleX = 2 + gameScale;
     });
-
-    // Create target blocks for froggo to jump into.
-    winnerBlocks = this.physics.add.staticGroup({
-        key: 'blank',
-        repeat: 5,
-        setXY: {x: (parapetPositionX + 1.5) * SPRITE_SIZE * gameScale, y: parapetPositionY * SPRITE_SIZE * gameScale, stepX: SPRITE_SIZE * gameScale * 3}
-    });
-
-    bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
-    bgImage.setScale(gameScale);
 
     scoreText = this.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#fff'});
 
@@ -154,7 +144,6 @@ function create () {
 
     // Set the colliders.
     this.physics.add.collider(player, parapets, deadFroggo, null, this);
-    this.physics.add.overlap(player, winnerBlocks, winFroggo);
     this.physics.add.overlap(player, smugFrogs, showSmuggy, null, this);
 }
 
@@ -231,20 +220,13 @@ function showSmuggy(player, smuggy) {
     smuggy.setActive(false);
 }
 
-function winFroggo(player) {
+
+function upScore() {
     player.body.stop();
     player.body.reset(spritePositionHz, spritePositionV);
     allowButton = true;
-
     player_horizLevel = player_origHorizLevel;
     player_vertLevel = player_origVertLevel;
-    // target.x = player_origHorizLevel;
-    // target.y = player_origVertLevel;
-    // player.setTint(0x00ff00);
-}
-
-function upScore() {
-    console.log("vert level: ", player_vertLevel);
     if (scoreArray.includes(player_vertLevel)) {
         console.log("already scored");
     } else if (player_vertLevel === 13) {
