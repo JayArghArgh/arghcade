@@ -92,6 +92,13 @@ function create () {
     player.setCollideWorldBounds(true);
 
     this.anims.create({
+        key: 'still',
+        frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 2, end: 2}),
+        frameRate: 1,
+        repeat: 1
+    });
+
+    this.anims.create({
         key: 'ahead',
         frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 1, end: 2}),
         frameRate: 15,
@@ -99,6 +106,8 @@ function create () {
     });
 
     player.setScale(gameScale);
+    player.anims.play('still', true);
+
     // Set the colliders.
     this.physics.add.collider(player, parapets, deadFroggo, null, this);
     this.physics.add.overlap(player, winnerBlocks, winFroggo, null, this);
