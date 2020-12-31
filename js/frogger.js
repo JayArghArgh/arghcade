@@ -52,12 +52,12 @@ function preload () {
         'assets/frogger/frogger_spritesheet.png',
         {frameWidth: SPRITE_SIZE, frameHeight: SPRITE_SIZE}
         );
+    // this.load.atlas("new_spritesheet", "assets/frogger/spritesheet.png", "assets/frogger/spritesheet.json");
     this.load.image('ground', 'assets/frogger/icon-frogger-pixel-512x512.png');
 }
 
 
 function create () {
-
     cursors = this.input.keyboard.createCursorKeys();
 
     let parapetPositionX = -0.5;
@@ -75,6 +75,7 @@ function create () {
 
     bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
     bgImage.setScale(gameScale);
+
 
     // Create target blocks for froggo to jump into.
     winnerBlocks = this.physics.add.staticGroup();
@@ -113,7 +114,6 @@ function update () {
             target.y = player.y - SPRITE_SIZE * gameScale;
             this.physics.moveToObject(player, target, PLAYER_SPEED);
             player_vertLevel ++;
-            console.log(player.x, player.y);
         }
 
     } else if (Phaser.Input.Keyboard.JustDown(cursors.down)) {
@@ -125,7 +125,6 @@ function update () {
             target.y = player.y + SPRITE_SIZE * gameScale;
             this.physics.moveToObject(player, target, PLAYER_SPEED);
             player_vertLevel --;
-            console.log(player.x, player.y);
         }
 
     } else if (Phaser.Input.Keyboard.JustDown(cursors.left)) {
@@ -137,7 +136,6 @@ function update () {
             target.y = player.y;
             this.physics.moveToObject(player, target, PLAYER_SPEED);
             player_horizLevel --;
-            console.log(player.x, player.y);
         }
 
     } else if (Phaser.Input.Keyboard.JustDown(cursors.right)) {
@@ -149,7 +147,6 @@ function update () {
             target.y = player.y;
             this.physics.moveToObject(player, target, PLAYER_SPEED);
             player_horizLevel ++;
-            console.log(player.x, player.y);
         }
 
     }
