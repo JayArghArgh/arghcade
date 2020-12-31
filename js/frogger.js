@@ -32,6 +32,10 @@ let allowButton = true;
 let parapets;
 let winnerBlocks;
 let smugFrogs;
+let scoreText;
+let score = 0;
+let scoreArrayOrig = 7;
+let scoreArray = [];
 
 let config = {
     type: Phaser.AUTO,
@@ -68,6 +72,7 @@ function preload () {
 
 
 function create () {
+    scoreArray.push(scoreArrayOrig);
     cursors = this.input.keyboard.createCursorKeys();
 
     let parapetPositionX = -0.5;
@@ -93,6 +98,7 @@ function create () {
 
     bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
     bgImage.setScale(gameScale);
+    scoreText = this.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#fff'});
 
     // Place the froggo.
     player = this.physics.add.sprite(spritePositionHz, spritePositionV , 'frogger_spritesheet');
@@ -155,6 +161,7 @@ function update () {
             target.y = player.y - SPRITE_SIZE * gameScale;
             this.physics.moveToObject(player, target, PLAYER_SPEED);
             player_vertLevel ++;
+            upScore();
         }
 
     } else if (Phaser.Input.Keyboard.JustDown(cursors.down)) {
@@ -227,4 +234,20 @@ function winFroggo(player) {
     // target.x = player_origHorizLevel;
     // target.y = player_origVertLevel;
     // player.setTint(0x00ff00);
+}
+
+function upScore() {
+    console.log("vert level: ", player_vertLevel);
+    if (scoreArray.includes(player_vertLevel)) {
+        console.log("already scored");
+    } else if (player_vertLevel === 13) {
+        score += 50;
+        scoreArray = [];
+        scoreArray.push(scoreArrayOrig);
+    } else {
+        // Check the score is valid
+        scoreArray.push(player_vertLevel);
+        score += 10;
+    }
+    scoreText.setText('Score: ' + score);
 }
