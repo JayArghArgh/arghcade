@@ -24,11 +24,12 @@ let player_horizLevel = player_origHorizLevel;
 // Starting point for Frogger
 let spritePositionHz = GAME_WIDTH * gameScale / 2;
 let spritePositionV = GAME_HEIGHT * gameScale - (SPRITE_SIZE * gameScale * 1.5);
-
-let player;
-let cursors;
 let target = new Phaser.Math.Vector2();
 let allowButton = true;
+
+// Game objects.
+let player;
+let cursors;
 let parapets;
 let winnerBlocks;
 let smugFrogs;
@@ -36,6 +37,7 @@ let scoreText;
 let score = 0;
 let scoreArrayOrig = 7;
 let scoreArray = [];
+let goldCar;
 
 let config = {
     type: Phaser.AUTO,
@@ -61,13 +63,15 @@ function preload () {
     this.load.image('froggo', 'assets/frogger/icon-frogger-pixel-512x512.png');
     this.load.image('frogger_bg', 'assets/frogger/frogger_bg_plain.png');
     this.load.image('blank', 'assets/frogger/blank1616.png');
+    this.load.image('ground', 'assets/frogger/icon-frogger-pixel-512x512.png');
+
+    // Load the spritesheet.
     this.load.spritesheet(
         'frogger_spritesheet',
         'assets/frogger/frogger_spritesheet.png',
         {frameWidth: SPRITE_SIZE, frameHeight: SPRITE_SIZE}
     );
-    // this.load.atlas("new_spritesheet", "assets/frogger/spritesheet.png", "assets/frogger/spritesheet.json");
-    this.load.image('ground', 'assets/frogger/icon-frogger-pixel-512x512.png');
+
 }
 
 
@@ -77,11 +81,6 @@ function create () {
 
     let parapetPositionX = -0.5;
     let parapetPositionY = 2.5;
-    // let numParapets = 6;
-
-    // Load here for debugging.
-    // bgImage = this.add.image(GAME_WIDTH * gameScale / 2, GAME_HEIGHT * gameScale / 2, 'frogger_bg');
-    // bgImage.setScale(gameScale);
 
     // Create the Parapets at the end of the course that froggo can crash into.
     parapets = this.physics.add.staticGroup({
@@ -110,14 +109,6 @@ function create () {
     // Place the froggo.
     player = this.physics.add.sprite(spritePositionHz, spritePositionV , 'frogger_spritesheet');
     player.setCollideWorldBounds(true);
-
-    // Creates the sprite to just stand still.
-    this.anims.create({
-        key: 'still',
-        frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 2, end: 2}),
-        frameRate: 1,
-        repeat: 1
-    });
 
     // Just froggo looking ahead.
     this.anims.create({
@@ -148,17 +139,42 @@ function create () {
         child.setVisible(false);
     });
 
+    // create the gold car sprite
+    this.anims.create({
+        key: 'goldCar',
+        frames: this.anims.generateFrameNumbers('frogger_spritesheet', {start: 3, end: 3}),
+        frameRate: 10,
+        repeat: 1
+    });
+
+    let goldCarX = GAME_WIDTH * gameScale - SPRITE_SIZE * gameScale * 5;
+    let goldCarY = GAME_HEIGHT * gameScale - SPRITE_SIZE * gameScale * 2.5;
+    let goldCarStep = SPRITE_SIZE * gameScale * 3;
+
+    goldCar = this.physics.add.group({
+        key: 'goldCar',
+        repeat: 1,
+        setXY: {x: goldCarX, y: goldCarY, stepX: goldCarStep}
+    })
+
+    goldCar.children.iterate(function (child) {
+        child.setScale(gameScale);
+        child.anims.play('goldCar', true);
+    });
+
+
     player.setScale(gameScale);
-    player.anims.play('still', true);
-    // player.frame = 6;
+    player.setFrame(2)
 
     // Set the colliders.
     this.physics.add.collider(player, parapets, deadFroggo, null, this);
+    // this.physics.add.collider(player, goldCar, deadFroggo, null, this);
     this.physics.add.overlap(player, winnerBlocks, winFroggo);
     this.physics.add.overlap(player, smugFrogs, showSmuggy, null, this);
 }
 
 function update () {
+    // goldCar.setVelocityX(-160);
     if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
         if (allowButton && player_vertLevel < MAX_V_LEVEL) {
             allowButton = false;
@@ -235,12 +251,8 @@ function winFroggo(player) {
     player.body.stop();
     player.body.reset(spritePositionHz, spritePositionV);
     allowButton = true;
-
     player_horizLevel = player_origHorizLevel;
     player_vertLevel = player_origVertLevel;
-    // target.x = player_origHorizLevel;
-    // target.y = player_origVertLevel;
-    // player.setTint(0x00ff00);
 }
 
 function upScore() {
