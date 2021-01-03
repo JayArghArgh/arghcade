@@ -147,7 +147,7 @@ function create () {
         repeat: 1
     });
 
-    let goldCarX = GAME_WIDTH * gameScale - SPRITE_SIZE * gameScale * 5;
+    let goldCarX = GAME_WIDTH * gameScale;
     let goldCarY = GAME_HEIGHT * gameScale - SPRITE_SIZE * gameScale * 2.5;
     let goldCarStep = SPRITE_SIZE * gameScale * 3;
 
@@ -174,7 +174,6 @@ function create () {
 }
 
 function update () {
-    // goldCar.setVelocityX(-160);
     if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
         if (allowButton && player_vertLevel < MAX_V_LEVEL) {
             allowButton = false;
@@ -222,7 +221,6 @@ function update () {
 
     }
 
-
     let distance = Phaser.Math.Distance.Between(player.x, player.y, target.x, target.y);
 
     if (player.body.speed > 0) {
@@ -233,6 +231,20 @@ function update () {
             player.body.reset(target.x, target.y);
             allowButton = true;
         }
+    }
+
+    goldCar.children.each(function(car) {
+        car.setVelocityX(-160);
+        moveGoldCar(car);
+    }, this);
+}
+
+function moveGoldCar(car) {
+    // moves car back to start
+    if (car.x < 0 ) {
+        console.log("move car");
+        // car.body.stop();
+        car.body.reset(GAME_WIDTH * gameScale, car.y);
     }
 }
 
