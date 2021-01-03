@@ -38,6 +38,7 @@ let score = 0;
 let scoreArrayOrig = 7;
 let scoreArray = [];
 let goldCar;
+let timer;
 
 let config = {
     type: Phaser.AUTO,
@@ -76,6 +77,16 @@ function preload () {
 
 
 function create () {
+    // create a timer for use throught the game.
+    timer = this.time.addEvent({
+        delay: 999999,
+        paused: false
+    });
+
+    // this.input.on('pointerdown', function () {
+    //     timer.paused = !timer.paused;
+    // });
+
     scoreArray.push(scoreArrayOrig);
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -168,7 +179,7 @@ function create () {
 
     // Set the colliders.
     this.physics.add.collider(player, parapets, deadFroggo, null, this);
-    // this.physics.add.collider(player, goldCar, deadFroggo, null, this);
+    this.physics.add.collider(player, goldCar, deadFroggo, null, this);
     this.physics.add.overlap(player, winnerBlocks, winFroggo);
     this.physics.add.overlap(player, smugFrogs, showSmuggy, null, this);
 }
@@ -237,6 +248,10 @@ function update () {
         car.setVelocityX(-160);
         moveGoldCar(car);
     }, this);
+
+    // text
+    //     .setFill(timer.paused ? cssColors.yellow : cssColors.aqua)
+    //     .setText(timer.getElapsedSeconds().toFixed(1));
 }
 
 function moveGoldCar(car) {
@@ -250,7 +265,20 @@ function moveGoldCar(car) {
 
 function deadFroggo(player, wall) {
     player.setTint(0xff0000);
-    gameOver = true;
+    // this.scene.pause();
+    // pause for two seconds
+    let targetTime = timer.getElapsedSeconds() + 5;
+    // TODO move this to the update section... der!
+    if (targetTime > timer.getElapsedSeconds) {
+        // player.body.moves = false;
+        game.paused = true;
+        console.log('paused');
+        console.log(targetTime, timer.getElapsedSeconds());
+    }
+    winFroggo(player)
+    game.paused = false;
+    // console.log('unpaused');
+    gameOver = false;
 }
 
 function showSmuggy(player, smuggy) {
